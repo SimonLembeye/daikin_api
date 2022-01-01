@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/dashboard")
 def index():
-    return render_template("index.html", tank_temperature=framboise.tank_temperature, )
+    return render_template("index.html", tank_temperature=framboise.tank_temperature)
 
 @app.route("/data")
 def data():
@@ -17,7 +17,7 @@ def data():
         "name": "Framboise",
         "tank_temperature": framboise.tank_temperature,
     }
-    return d
+    return make_response(jsonify(d), 200)
 
 
 
