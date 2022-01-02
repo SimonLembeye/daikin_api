@@ -23,6 +23,7 @@ def data():
         "power_consumption": framboise.power_consumption,
         "tank_power_state": framboise.tank_power_state,
         "tank_powerful_state": framboise.tank_powerful_state
+        "error_state" : framboise.error_state
     }
     return make_response(jsonify(d), 200)
 
@@ -37,7 +38,11 @@ def startstop(go):
 
     return f"Framboise are you ok ? : {framboise.power_state}"
 
-
+@app.route("/offset/<go>", methods=['GET'])
+def set_offset(go):
+    valgo=float(go)
+    framboise.set_offset(valgo)
+    return f"Offset : {go}"
 
 
 

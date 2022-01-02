@@ -31,6 +31,7 @@ class DaikinAltherma:
                 }
             }
             js_request['m2m:rqp'].update(set_value_params)
+        #print(f"Send to ws: {json.dumps(js_request)}")
         self.ws.send(json.dumps(js_request))
         result = json.loads(self.ws.recv())
         assert result["m2m:rsp"]["rqi"] == reqid
@@ -46,6 +47,11 @@ class DaikinAltherma:
         # either BRP069A61 or BRP069A62
         return self._requestValue("MNCSE-node/deviceInfo", "/m2m:rsp/pc/m2m:dvi/mod")
 
+    @property
+    def error_state(self) -> bool:
+        """ Returns the error state """
+        return self._requestValueHP("0/UnitStatus/ErrorState/la", "m2m:rsp/pc/m2m:cin/con") == 1
+   
     @property
     def tank_temperature(self) -> float:
         """ Returns the hot water tank temperature, in °C """
@@ -107,8 +113,17 @@ class DaikinAltherma:
             'con': mode_dict[heating_active],
             'cnf': 'text/plain:0',
         }
-        self._requestValueHP("1/Operation/Power", "/", payload)
+        #print(f"Output set_heating: {self._requestValueHP('1/Operation/Power', '/', payload)}")
+        self._requestValueHP('1/Operation/Power', '/', payload)
 
+    def set_offset(self, offset: float):
+       
+        payload = {
+            'con': offset,
+            'cnf': 'text/plain:0',
+        }
+        #print(f"Output set_heating: {self._requestValueHP('1/Operation/LeavingWaterTemperatureOffsetHeating', '/', payload)}")
+        self._requestValueHP('1/Operation/LeavingWaterTemperatureOffsetHeating', '/', payload)
 
     def set_tank_heating(self, powerful_active: bool):
         """ Whether to turn the water tank heating on(True) or off(False).
@@ -126,6 +141,16 @@ class DaikinAltherma:
 
         self._requestValueHP("2/Operation/Powerful", "/", payload)
 
+    def set_tank_temperature(self, tank_temp: float):
+
+        payload = {
+            'con': tank_temp,
+            'cnf': 'text/plain:0',
+        }
+        
+        self._requestValueHP('1/Operation/TargetTemperature', '/', payload)
+
+
 if __name__ == "__main__":
     ad = DaikinAltherma("192.168.1.97", "Framboise")
     print(f"Adadter Model: {ad.adapter_model}")
@@ -136,6 +161,11 @@ if __name__ == "__main__":
     print(ad.power_state)
     print(ad.power_consumption)
     ad.set_heating(True)
+    print()
+    print()
+    ad.set_offset(3)
     print(ad.power_state)
     print(ad.tank_power_state)
     print(ad.tank_powerful_state)
+    print(ad.error_state)
+
