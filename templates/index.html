@@ -8,7 +8,23 @@
 <body>
     <div>
         <h1>Les données de Framboise</h1>
-        <p>Tempature du ballon : {{ tank_temperature }}</p>
+        <p>Adaptateur : {{ adapter_model }}</p>
+        <p>Erreurs : {{ error_state }}</p>
+        <p>Fonctionnement du ballon : {{ tank_power_state }}</p>
+        <p>Mode puissant ballon : {{ tank_powerful_state }}</p>
+        <p>Température cible du ballon : {{ tank_temperature_target }}</p>
+        <p>Température du ballon : {{ tank_temperature }}</p>
+        <p>Fonctionnement chauffage : {{ heater_power_state }}</p>
+        <p>Température eau de chauffage : {{ leaving_water_temperature }}</p>
+        <p>Température extérieure : {{ outdoor_temperature }}</p>
+        <h1>Réglages ballon</h1>
+        <p><a href="startstoptank/1">Démarrer le ballon</a> 
+            <a href="startstoptank/0">Arrêter le ballon</a></p>
+        <p><a href="startstoptankpowerfull/1">Démarrer le mode puissant</a> 
+            <a href="startstoptankpowerfull/0">Arrêter le mode puissant</a></p>
+        <h1>Réglages chauffage</h1>
+        <p><a href="startstopheater/1">Démarrer le chauffage</a> 
+            <a href="startstopheater/0">Arrêter le chauffage</a></p>
     </div>
 </body>
 

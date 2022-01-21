@@ -41,6 +41,8 @@ class DaikinAltherma:
     def _requestValueHP(self, item: str, output_path: str, payload=None):
         return self._requestValue(f"MNAE/{item}", output_path, payload)
 
+    # ------------------------- General ----------------------------
+
     @property
     def adapter_model(self) -> str:
         """ Returns the model of the LAN adapter """
@@ -51,13 +53,6 @@ class DaikinAltherma:
     def error_state(self) -> bool:
         """ Returns the error state """
         return self._requestValueHP("0/UnitStatus/ErrorState/la", "m2m:rsp/pc/m2m:cin/con") == 1
-   
-    @property
-    def tank_temperature(self) -> float:
-        """ Returns the hot water tank temperature, in °C """
-        return self._requestValueHP(
-            "2/Sensor/TankTemperature/la", "/m2m:rsp/pc/m2m:cin/con"
-        )
 
     @property
     def indoor_temperature(self) -> float:
@@ -71,30 +66,22 @@ class DaikinAltherma:
         """ Returns the outdoor temperature, in °C """
         return self._requestValueHP(
             "1/Sensor/OutdoorTemperature/la", "/m2m:rsp/pc/m2m:cin/con"
-        )
+        )   
 
+
+    # ----------------------------- Heater ------------------------------
+    
+    @property
+    def power_state(self) -> bool:
+        """ Returns the power state """
+        return self._requestValueHP("1/Operation/Power/la", "m2m:rsp/pc/m2m:cin/con") == "on"
+    
     @property
     def leaving_water_temperature(self) -> float:
         """ Returns the heating leaving water temperature, in °C """
         return self._requestValueHP(
             "1/Sensor/LeavingWaterTemperatureCurrent/la", "m2m:rsp/pc/m2m:cin/con"
         )
-
-    @property
-    def power_state(self) -> bool:
-        """ Returns the power state """
-        return self._requestValueHP("1/Operation/Power/la", "m2m:rsp/pc/m2m:cin/con") == "on"
-
-    @property
-    def tank_power_state(self) -> bool:
-        """ Returns the tank power state """
-        return self._requestValueHP("2/Operation/Power/la", "m2m:rsp/pc/m2m:cin/con") == "on"
-
-
-    @property
-    def tank_powerful_state(self) -> bool:
-        """ Returns the tank powerful state """
-        return self._requestValueHP("2/Operation/Powerful/la", "m2m:rsp/pc/m2m:cin/con") == 1
 
     @property
     def power_consumption(self) -> dict:
@@ -125,8 +112,55 @@ class DaikinAltherma:
         #print(f"Output set_heating: {self._requestValueHP('1/Operation/LeavingWaterTemperatureOffsetHeating', '/', payload)}")
         self._requestValueHP('1/Operation/LeavingWaterTemperatureOffsetHeating', '/', payload)
 
-    def set_tank_heating(self, powerful_active: bool):
-        """ Whether to turn the water tank heating on(True) or off(False).
+
+    #------------------------------- Tank ---------------------------------
+
+    @property
+    def tank_power_state(self) -> bool:
+        """ Returns the power state """
+        return self._requestValueHP("2/Operation/Power/la", "m2m:rsp/pc/m2m:cin/con") == "on"
+
+    @property
+    def tank_powerful_state(self) -> bool:
+        """ Returns the tank powerful state """
+        return self._requestValueHP("2/Operation/Powerful/la", "m2m:rsp/pc/m2m:cin/con") == 1
+
+    @property
+    def tank_temperature(self) -> float:
+        """ Returns the hot water tank temperature, in °C """
+        return self._requestValueHP(
+            "2/Sensor/TankTemperature/la", "/m2m:rsp/pc/m2m:cin/con"
+        )
+
+    @property
+    def power_consumption_tank(self) -> dict:
+        """ Returns the energy consumption in kWh per [D]ay, [W]eek, [M]onth """
+        return self._requestValueHP("2/Consumption/la", "m2m:rsp/pc/m2m:cin/con")
+
+    @property
+    def tank_temperature_value(self) -> float:
+        """ Returns the target value of tank temperature """
+        return self._requestValueHP("2/Operation/TargetTemperature/la", "m2m:rsp/pc/m2m:cin/con")  
+
+
+    def set_tank_heating(self, heating_active: bool):
+        """ Whether to turn the heating on(True) or off(False).
+        You can confirm that it works by calling self.power_state
+        """
+        mode_dict = {
+            True: 'on',
+            False: 'standby',
+        }
+        payload = {
+            'con': mode_dict[heating_active],
+            'cnf': 'text/plain:0',
+        }
+        #print(f"Output set_heating: {self._requestValueHP('1/Operation/Power', '/', payload)}")
+        self._requestValueHP('2/Operation/Power', '/', payload)
+
+
+    def set_tank_heating_powerfull(self, powerful_active: bool):
+        """ Whether to turn the water tank heating powerful on(True) or off(False).
         You can confirm that it works by calling self.tank_powerful_state
         """
         mode_dict = {
@@ -141,6 +175,7 @@ class DaikinAltherma:
 
         self._requestValueHP("2/Operation/Powerful", "/", payload)
 
+    
     def set_tank_temperature(self, tank_temp: float):
 
         payload = {
@@ -148,24 +183,51 @@ class DaikinAltherma:
             'cnf': 'text/plain:0',
         }
         
-        self._requestValueHP('1/Operation/TargetTemperature', '/', payload)
+        self._requestValueHP('2/Operation/TargetTemperature', '/', payload)
+
 
 
 if __name__ == "__main__":
     ad = DaikinAltherma("192.168.1.97", "Framboise")
+
+
+    print ("General")
+    print()
     print(f"Adadter Model: {ad.adapter_model}")
-    print(ad.tank_temperature)
-    print(ad.outdoor_temperature)
+    print(f"Error State: {ad.error_state}")
+    print(f"Outdoor Temperature: {ad.outdoor_temperature}")
     # print(ad.indoor_temperature)
-    print(ad.leaving_water_temperature)
-    print(ad.power_state)
-    print(ad.power_consumption)
+    print()
+
+
+    print("Heater")
+    print()
+    print(f"Power State: {ad.power_state}")
+    print(f"Leaving Water Temperature: {ad.leaving_water_temperature}")
+    print("set heating true")
     ad.set_heating(True)
+    print("set offset to 0")
+    ad.set_offset(0)
     print()
+    print(ad.power_consumption)
     print()
-    ad.set_offset(3)
-    print(ad.power_state)
-    print(ad.tank_power_state)
-    print(ad.tank_powerful_state)
-    print(ad.error_state)
+
+
+    print("Tank")
+    print()
+    print("set tank power True")
+    ad.set_tank_heating(True)
+    print(f"Tank Power State : {ad.tank_power_state}")
+    print("set tank heating powerfull False")
+    ad.set_tank_heating_powerfull(False)
+    print(f"Tank Powerfull State : {ad.tank_powerful_state}")
+    print("set tank temperature to 51°C")
+    ad.set_tank_temperature(51)
+    print(f"Tank Temperature Target : {ad.tank_temperature_value}")
+    print(f"Tank Temperature: {ad.tank_temperature}")
+    print()
+    print(ad.power_consumption_tank)
+    print()
+    
+
 
