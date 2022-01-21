@@ -107,3 +107,17 @@ document.getElementById("start-heater-btn").onclick = () => {
             console.log(error);
         })
 }
+
+document.getElementById("set-offset-btn").onclick = () => {
+    let offsetValue = document.getElementById("set-offset-value").value;
+    console.log("ICICICI")
+    console.log(offsetValue);
+        axios.get('/offset/' + offsetValue)
+        .then(function (response) {
+            console.log(response);
+            location.reload();
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+}

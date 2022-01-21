@@ -45,11 +45,24 @@
         </ul>
     </div>
 
-    <div class="card mt-4">
+    <div class="card mt-4 mb-5">
         <div class="card-header">Chauffage</div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Fonctionnement chauffage : <span id="heater-state">{{ heater_power_state }}</span></li>
+            <li class="list-group-item">Fonctionnement chauffage : <span
+                    id="heater-state">{{ heater_power_state }}</span></li>
             <li class="list-group-item">Température eau de chauffage : {{ leaving_water_temperature }}</li>
+            <li class="list-group-item">
+                Offset : {{ offset_leaving_temperature }}
+                <div style="display: flex;">
+                    <input class="form-control"
+                           type="text"
+                           placeholder="0"
+                           id="set-offset-value"
+                           style="max-width: 50px;">
+                    <button type="submit" id="set-offset-btn" class="btn btn-primary">Submit</button>
+                </div>
+
+            </li>
             <li class="list-group-item">
                 <div class="btn btn-success" id="start-heater-btn">Démarrer le chauffage</div>
                 <div class="btn btn-danger" id="stop-heater-btn">Arrêter le chauffage</div>

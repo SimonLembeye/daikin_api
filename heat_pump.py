@@ -90,6 +90,13 @@ class DaikinAltherma:
         )
 
     @property
+    def target_water_temperature(self) -> float:
+        """ Returns the heating leaving water temperature, in °C """
+        return self._requestValueHP(
+            "1/Sensor/TargetLeavingWaterTemperatureCurrent/la", "m2m:rsp/pc/m2m:cin/con"
+        )
+
+    @property
     def power_consumption(self) -> dict:
         """ Returns the energy consumption in kWh per [D]ay, [W]eek, [M]onth """
         return self._requestValueHP("1/Consumption/la", "m2m:rsp/pc/m2m:cin/con")
@@ -109,13 +116,21 @@ class DaikinAltherma:
         # print(f"Output set_heating: {self._requestValueHP('1/Operation/Power', '/', payload)}")
         self._requestValueHP("1/Operation/Power", "/", payload)
 
+    @property
+    def offset_value(self) -> float:
+        """ Returns the target value of tank temperature """
+        return self._requestValueHP(
+            "1/Operation/LeavingWaterTemperatureOffsetHeating/la",
+            "m2m:rsp/pc/m2m:cin/con",
+        )
+
     def set_offset(self, offset: float):
 
         payload = {
             "con": offset,
             "cnf": "text/plain:0",
         }
-        # print(f"Output set_heating: {self._requestValueHP('1/Operation/LeavingWaterTemperatureOffsetHeating', '/', payload)}")
+
         self._requestValueHP(
             "1/Operation/LeavingWaterTemperatureOffsetHeating", "/", payload
         )
@@ -217,6 +232,7 @@ if __name__ == "__main__":
     ad.set_heating(True)
     print("set offset to 0")
     ad.set_offset(0)
+    print(f"offset: {ad.offset_value}")
     print()
     print(ad.power_consumption)
     print()
@@ -230,7 +246,7 @@ if __name__ == "__main__":
     ad.set_tank_heating_powerfull(False)
     print(f"Tank Powerfull State : {ad.tank_powerful_state}")
     print("set tank temperature to 51°C")
-    ad.set_tank_temperature(51)
+    ad.set_tank_temperature(50)
     print(f"Tank Temperature Target : {ad.tank_temperature_value}")
     print(f"Tank Temperature: {ad.tank_temperature}")
     print()
