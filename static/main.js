@@ -110,9 +110,7 @@ document.getElementById("start-heater-btn").onclick = () => {
 
 document.getElementById("set-offset-btn").onclick = () => {
     let offsetValue = document.getElementById("set-offset-value").value;
-    console.log("ICICICI")
-    console.log(offsetValue);
-        axios.get('/offset/' + offsetValue)
+    axios.get('/offset/' + offsetValue)
         .then(function (response) {
             console.log(response);
             location.reload();
