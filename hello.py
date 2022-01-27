@@ -1,9 +1,14 @@
 from flask import Flask, render_template, jsonify, make_response
 from heat_pump import DaikinAltherma
+from helpers_db import query_db
+import json
 
 framboise = DaikinAltherma("192.168.1.97", "Framboise")
 
 app = Flask(__name__, static_folder='static', template_folder="templates")
+
+
+app = Flask(__name__)
 
 
 @app.route("/dashboard")
@@ -41,6 +46,13 @@ def data():
         "tank_power_consumption": framboise.power_consumption_tank,
     }
     return make_response(jsonify(d), 200)
+
+
+@app.route("/read_database")
+def read_database():
+    my_query = query_db("select * from measurements")
+    json_output = json.dumps(my_query)
+    return make_response(json_output, 200)
 
 
 @app.route("/startstopheater/<go>", methods=["GET"])
