@@ -5,7 +5,7 @@ import json
 
 framboise = DaikinAltherma("192.168.1.97", "Framboise")
 
-app = Flask(__name__, static_folder='static', template_folder="templates")
+app = Flask(__name__, static_folder="static", template_folder="templates")
 
 
 app = Flask(__name__)
@@ -103,3 +103,6 @@ def set_tank_temperature(temperature):
     val = float(temperature)
     framboise.set_tank_temperature(val)
     return f"Tank Temperature Target : {temperature}"
+
+
+
