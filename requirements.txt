@@ -7,6 +7,7 @@ itsdangerous==2.0.1
 Jinja2==3.0.3
 MarkupSafe==2.0.1
 psycopg2==2.9.3
+uWSGI==2.0.20
 websocket-client==1.2.3
 Werkzeug==2.0.2
 zope.event==4.5.0
